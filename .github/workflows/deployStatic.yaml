@@ -22,9 +22,10 @@ jobs:
         run: zip -qq -r portal-input.zip . -x admin-APIMATIC-BUILD.json user-APIMATIC-BUILD.json
 
       - name: Call build endpoint
-        run: curl -X POST --url 'https://api.apimatic.io/portal' \
-               -H 'Authorization:X-Auth-Key ${{ secrets.API_KEY }}' \
-               -F 'file=@portal-input.zip' -o portal-output.zip
+        run: curl -X POST --url https://api.apimatic.io/portal \
+              -H "Authorization: X-Auth-Key ${{ secrets.API_KEY }}" \
+              -F "file=@portal-input.zip" -o portal-output.zip
+
 
       - name: list
         run: ls
@@ -58,9 +59,9 @@ jobs:
         run: zip -qq -r role2-input.zip . -x user-APIMATIC-BUILD.json admin-APIMATIC-BUILD.json
 
       - name: Call build endpoint
-        run: curl -X POST --url 'https://api.apimatic.io/portal' \
-               -H 'Authorization:X-Auth-Key ${{ secrets.API_KEY }}' \
-               -F 'file=@role2-input.zip' -o role2-output.zip
+        run: curl -X POST --url https://api.apimatic.io/portal \
+              -H "Authorization: X-Auth-Key ${{ secrets.API_KEY }}" \
+              -F "file=@portal-input.zip" -o portal-output.zip
 
       - name: list
         run: ls

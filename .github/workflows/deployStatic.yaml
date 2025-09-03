@@ -1,0 +1,80 @@
+name: Deploy Static Portal
+
+on:
+  workflow_dispatch:  
+  push:
+    branches: 
+      - main
+
+jobs:
+  role1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: checkout-repo
+        id: checkout-repo
+
+      - name: Prepare build file
+        run: |
+          cp user-APIMATIC-BUILD.json APIMATIC-BUILD.json
+
+      - name: Zip files
+        run: zip -qq -r portal-input.zip . -x admin-APIMATIC-BUILD.json user-APIMATIC-BUILD.json
+
+      - name: Call build endpoint
+        run: curl -X POST --url 'https://api.apimatic.io/portal' \
+               -H 'Authorization:X-Auth-Key ${{ secrets.API_KEY }}' \
+               -F 'file=@portal-input.zip' -o portal-output.zip
+
+      - name: list
+        run: ls
+
+      - name: Extract generated Portal
+        run: unzip -qq portal-output.zip -d static-portal
+
+      - name: list
+        run: ls
+        working-directory: "static-portal"
+
+      - name: Publish
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages publish static-portal --branch=admin --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+
+  role2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: checkout-repo
+        id: checkout-repo
+
+      - name: Prepare build file
+        run: |
+          cp admin-APIMATIC-BUILD.json APIMATIC-BUILD.json
+
+      - name: Zip files
+        run: zip -qq -r role2-input.zip . -x user-APIMATIC-BUILD.json admin-APIMATIC-BUILD.json
+
+      - name: Call build endpoint
+        run: curl -X POST --url 'https://api.apimatic.io/portal' \
+               -H 'Authorization:X-Auth-Key ${{ secrets.API_KEY }}' \
+               -F 'file=@role2-input.zip' -o role2-output.zip
+
+      - name: list
+        run: ls
+
+      - name: Extract generated Portal
+        run: unzip -qq role2-output.zip -d static-portal2
+
+      - name: list
+        run: ls
+        working-directory: "static-portal2"
+
+      - name: Publish
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages publish static-portal2 --branch=user --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}

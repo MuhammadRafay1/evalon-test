@@ -1,0 +1,15 @@
+toc:
+  - group: Getting Started
+    items:
+      - generate: How to Get Started
+        from: getting-started
+  - group: API Recipes
+    items:
+      - page: Hosted Cards Recipe
+        file: recipes/HostedCardsRecipe.md
+  - generate: API Endpoints
+    from: endpoints
+  - generate: Models
+    from: models
+  - generate: SDK Infrastructure
+    from: sdk-infra
